@@ -34,7 +34,7 @@ export default {
   data() {
     return {
       recommends: []
-      // recommendlist: []
+      // disclist: []
     }
   },
   created() {
