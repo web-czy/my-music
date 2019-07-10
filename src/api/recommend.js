@@ -1,5 +1,5 @@
 import jsonp from 'common/js/jsonp'
-import { commonParams, commonParams2, options } from './config'
+import { commonParams, options } from './config'
 
 export function getRecommend() {
   const url =
@@ -18,7 +18,7 @@ export function getRecommend() {
 
 export function getDiscList() {
   const url = 'https://c.y.qq.com/splcloud/fcgi-bin/fcg_get_diss_by_tag.fcg'
-  const data = Object.assign({}, commonParams2, {
+  const data = Object.assign({}, commonParams, {
     platform: 'yqq',
     hostUin: 0,
     sin: 0,

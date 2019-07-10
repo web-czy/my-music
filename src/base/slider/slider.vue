@@ -12,9 +12,9 @@
     <div class="dots">
       <span
         class="dot"
+        :class="{active: currentPageIndex === index}"
         v-for="(item,index) in dots"
         :key="index"
-        :class="{active: currentPageIndex === index}"
       ></span>
     </div>
   </div>
@@ -25,12 +25,7 @@ import BScroll from 'better-scroll'
 import { addClass } from 'common/js/dom'
 
 export default {
-  data() {
-    return {
-      dots: [],
-      currentPageIndex: 0
-    }
-  },
+  name: 'slider',
   props: {
     // loop 轮播
     loop: {
@@ -46,6 +41,12 @@ export default {
     interval: {
       type: Number,
       default: 4000
+    }
+  },
+  data() {
+    return {
+      dots: [],
+      currentPageIndex: 0
     }
   },
   mounted() {
@@ -66,6 +67,24 @@ export default {
       this._setSliderWidth(true)
       this.slider.refresh()
     })
+  },
+  activated() {
+    this.slider.enable()
+    let pageIndex = this.slider.getCurrentPage().pageX
+    this.slider.goToPage(pageIndex, 0, 0)
+    this.currentPageIndex = pageIndex
+    if (this.autoPlay) {
+      this._play()
+    }
+  },
+  deactivated() {
+    this.slider.disable()
+    clearTimeout(this.timer)
+  },
+  beforeDestroy() {
+    // 禁用better-scroll，清掉计时器
+    this.slider.disable()
+    clearTimeout(this.timer)
   },
   methods: {
     _setSliderWidth(isResize) {
@@ -93,44 +112,40 @@ export default {
       this.slider = new BScroll(this.$refs.slider, {
         scrollX: true,
         scrollY: false,
-        // momentum惯性
-        momentum: false,
+        momentum: false, // momentum惯性
         snap: {
           loop: this.loop,
-          threshold: 0.3
+          threshold: 0.3,
+          speed: 400
         }
-        // click: true
       })
-      this.slider.on('scrollEnd', () => {
-        let pageIndex = this.slider.getCurrentPage().pageX
-        // if (this.loop) {
-        //   pageIndex -= 1
-        // }
-        this.currentPageIndex = pageIndex
+      this.slider.on('scrollEnd', this._onScrollEnd)
+
+      this.slider.on('touchend', () => {
         if (this.autoPlay) {
-          clearTimeout(this.timer)
           this._play()
         }
       })
+
+      this.slider.on('beforeScrollStart', () => {
+        if (this.autoPlay) {
+          clearTimeout(this.timer)
+        }
+      })
+    },
+    _onScrollEnd() {
+      let pageIndex = this.slider.getCurrentPage().pageX
+      this.currentPageIndex = pageIndex
+      if (this.autoPlay) {
+        this._play()
+      }
     },
     _play() {
-      let pageIndex = this.currentPageIndex + 1
-      // console.log('this.currentPageIndex:' + this.currentPageIndex)
-      // if (this.loop) {
-      //   pageIndex += 1
-      // }
-      // console.log(pageIndex)
+      clearTimeout(this.timer)
       this.timer = setTimeout(() => {
-        this.slider.goToPage(pageIndex, 0, 400)
+        this.slider.next()
       }, this.interval)
-      if (this.currentPageIndex === this.dots.length - 1) {
-        pageIndex = 0
-      }
     }
-  },
-  destroyed() {
-    // 组件里边如果有计时器，那么在组件销毁destroyed的时候，把计时器清掉
-    clearTimeout(this.timer)
   }
 }
 </script>
