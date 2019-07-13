@@ -33,8 +33,8 @@ import { ERR_OK } from 'api/config'
 export default {
   data() {
     return {
-      recommends: []
-      // disclist: []
+      recommends: [],
+      disclist: []
     }
   },
   created() {
@@ -51,9 +51,8 @@ export default {
     },
     _getDiscList() {
       getDiscList().then((res) => {
-        console.log(res.code)
         if (res.code === ERR_OK) {
-          console.log(res.data.list)
+          this.disclist = res.data.list
         }
       })
     }
