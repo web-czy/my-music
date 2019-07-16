@@ -1,11 +1,14 @@
 <template>
-  <div class="singer">singer</div>
+  <div class="singer">
+    <list-view :data="singers"></list-view>
+  </div>
 </template>
 
 <script type="text/ecmascript-6">
 import { getSingerList } from 'api/singer'
 import { ERR_OK } from 'api/config'
 import Singer from 'common/js/singer'
+import ListView from 'base/listview/listview'
 
 const HOT_NAME = '热门'
 const HOT_SINNER_LENGTH = 10
@@ -25,7 +28,6 @@ export default {
       getSingerList().then((res) => {
         if (res.code === ERR_OK) {
           this.singers = this._normalizeSinger(res.data.list)
-          console.log(this.singers)
         }
       })
     },
@@ -40,7 +42,7 @@ export default {
         if (index < HOT_SINNER_LENGTH) {
           // push热门列表
           map.hot.items.push(new Singer({
-            id: item.Fsinger_id,
+            id: item.Fsinger_mid,
             name: item.Fsinger_name
           }))
         }
@@ -53,7 +55,7 @@ export default {
           }
         }
         map[key].items.push(new Singer({
-          id: item.Fsinger_id,
+          id: item.Fsinger_mid,
           name: item.Fsinger_name
         }))
       })
@@ -73,6 +75,9 @@ export default {
       })
       return hot.concat(ret)
     }
+  },
+  components: {
+    ListView
   }
 }
 </script>
