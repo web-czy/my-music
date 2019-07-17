@@ -61,8 +61,11 @@ export default {
       this.touch.y2 = firstTouch.pageY
       // 后边加上或0 |0 就和Math.floor()的效果是一样的,向下取整
       // delta: 偏移的锚点
+      // 用当前移动触摸的y轴坐标减去触摸屏幕时手落下的y轴坐标
+      // 比如321(G)-287(E)=34再除以li的高度18  等于1.8888，向下取整为1，所以向下偏移1个下标
       let delta = (this.touch.y2 - this.touch.y1) / ANCHOR_HEIGHT | 0
       let anchorIndex = parseInt(this.touch.anchorIndex) + delta
+      console.log(anchorIndex)
       this._scrollTo(anchorIndex)
     },
     _scrollTo(index) {
