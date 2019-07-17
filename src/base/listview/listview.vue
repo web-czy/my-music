@@ -1,5 +1,5 @@
 <template>
-  <scroll class="listview" :data="data" ref="listview">
+  <scroll class="listview" :data="data" :probe-type="probeType" :listenScroll="true" ref="listview" @scroll="_scroll">
     <ul>
       <li v-for="group in data" :key="group.title" class="list-group" ref="listGroup">
         <h2 class="list-group-title">{{group.title}}</h2>
@@ -36,6 +36,11 @@ export default {
       }
     }
   },
+  data() {
+    return {
+      probeType: 3
+    }
+  },
   created() {
     this.touch = {}
   },
@@ -70,6 +75,9 @@ export default {
     },
     _scrollTo(index) {
       this.$refs.listview.scrollToElement(this.$refs.listGroup[index], 0)
+    },
+    _scroll(pos) {
+      console.log(pos.y)
     }
   },
   components: {
