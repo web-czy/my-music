@@ -1,5 +1,5 @@
 <template>
-  <div>123456</div>
+  <div class="singer-detail">123456</div>
 </template>
 
 <script type='text/ecmascript-6'>
@@ -22,7 +22,7 @@ export default {
 @import '~common/stylus/variable'
 @import '~common/stylus/mixin'
 
-.music-list
+.singer-detail
   position: fixed
   z-index: 100
   top: 0

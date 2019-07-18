@@ -2,7 +2,7 @@ import 'babel-polyfill'
 import Vue from 'vue'
 import App from './App.vue'
 import fastclick from 'fastclick'
-import router from 'components/router/index'
+import router from './router/index'
 import VueLazyLoad from 'vue-lazyload'
 
 import './common/stylus/index.styl'
