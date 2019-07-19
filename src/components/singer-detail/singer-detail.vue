@@ -1,5 +1,7 @@
 <template>
-  <div class="singer-detail">123456</div>
+  <transition appear name="slide">
+    <div class="singer-detail">123456</div>
+  </transition>
 </template>
 
 <script type='text/ecmascript-6'>
@@ -22,6 +24,10 @@ export default {
 @import '~common/stylus/variable'
 @import '~common/stylus/mixin'
 
+.slide-enter-active, .slide-leave-active
+  transition: all 0.3s
+.slide-enter, .slide-leave-to
+  transform: translate3d(100%, 0, 0)
 .singer-detail
   position: fixed
   z-index: 100
