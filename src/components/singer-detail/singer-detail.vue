@@ -5,18 +5,40 @@
 </template>
 
 <script type='text/ecmascript-6'>
+import { mapGetters } from 'vuex'
+import { getSingerDetail } from 'api/singer'
+import { ERR_OK } from 'api/config'
+
 export default {
-  // created() {
-  //   this._getDetail()
-  // },
-  // methods: {
-  //   _getDetail() {
-  //     if (!this.singer.id) {
-  //       this.$router.push('/singer')
-  //       return false
-  //     }
-  //   }
-  // }
+  data() {
+    return {
+      songs: []
+    }
+  }
+  computed: {
+    ...mapGetters([
+      'singer'
+    ])
+  },
+  created() {
+    this._getDetail()
+    // console.log(this.singer)
+  },
+  methods: {
+    _getDetail() {
+      // 如果直接在歌手详情页刷新了，vuex里边的singer就是个空对象
+      // 所以需要回退到歌手列表的路由页面，重新进入（边界处理例子）
+      if (!this.singer.id) {
+        this.$router.push('/singer')
+        return
+      }
+      getSingerDetail(this.singer.id).then((res) => {
+        if (res.code === ERR_OK) {
+          console.log(res.data)
+        }
+      })
+    }
+  }
 }
 </script>
 
