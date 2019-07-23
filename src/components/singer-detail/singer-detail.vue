@@ -1,6 +1,6 @@
 <template>
   <transition appear name="slide">
-    <div class="singer-detail">123456</div>
+    <music-list :bg-image="bgImage" :songs="songs" :title="title"></music-list>
   </transition>
 </template>
 
@@ -8,7 +8,8 @@
 import { mapGetters } from 'vuex'
 import { getSingerDetail } from 'api/singer'
 import { ERR_OK } from 'api/config'
-import { createSong } from 'common/js/song'
+import { createSong, isValidMusic, processSongsUrl } from 'common/js/song'
+import MusicList from 'components/music-list/music-list'
 
 export default {
   data() {
@@ -19,7 +20,13 @@ export default {
   computed: {
     ...mapGetters([
       'singer'
-    ])
+    ]),
+    bgImage() {
+      return this.singer.avatar
+    },
+    title() {
+      return this.singer.name
+    }
   },
   created() {
     this._getDetail()
@@ -35,7 +42,9 @@ export default {
       }
       getSingerDetail(this.singer.id).then((res) => {
         if (res.code === ERR_OK) {
-          console.log(res.data.list)
+          processSongsUrl(this._normalizeSongs(res.data.list)).then((songs) => {
+            this.songs = songs
+          })
         }
       })
     },
@@ -43,8 +52,15 @@ export default {
       let ret = []
       list.forEach((item) => {
         let { musicData } = item
+        if (isValidMusic(musicData)) {
+          ret.push(createSong(musicData))
+        }
       })
+      return ret
     }
+  },
+  components: {
+    MusicList
   }
 }
 </script>
@@ -57,12 +73,4 @@ export default {
   transition: all 0.3s
 .slide-enter, .slide-leave-to
   transform: translate3d(100%, 0, 0)
-.singer-detail
-  position: fixed
-  z-index: 100
-  top: 0
-  left: 0
-  bottom: 0
-  right: 0
-  background: $color-background
 </style>
