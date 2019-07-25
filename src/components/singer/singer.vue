@@ -30,6 +30,7 @@ export default {
       this.$router.push({
         path: `/singer/${singer.id}`
       })
+      // 把singer传进去，实现了对mutation的提交
       this.setSinger(singer)
     },
     _getSingerList() {
@@ -84,6 +85,9 @@ export default {
       return hot.concat(ret)
     },
     ...mapMutations({
+      // 把mutation的修改映射成方法名
+      // 让setSing对应mutation-type里边的SET_SINGER
+      // 调用那个方法直接用setSinger()就可以
       setSinger: 'SET_SINGER'
     })
   },
