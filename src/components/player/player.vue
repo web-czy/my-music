@@ -3,7 +3,13 @@
     class="player"
     v-show='playlist.length > 0'
   >
-    <transition name="normal">
+    <transition
+      name="normal"
+      @enter="enter"
+      @after-enter="afterEnter"
+      @leave="leave"
+      @after-leave="afterLeave"
+    >
       <div
         class="normal-player"
         v-show="fullScreen"
@@ -32,11 +38,15 @@
         </div>
         <div class="middle">
           <div class="middle-l">
-            <div class="cd-wrapper">
+            <div
+              class="cd-wrapper"
+              ref="cdWrapper"
+            >
               <div class="cd">
                 <img
                   :src="currentSong.image"
                   class="image"
+                  :class="cdCls"
                 >
               </div>
             </div>
@@ -51,7 +61,10 @@
               <i class="icon-prev"></i>
             </div>
             <div class="icon i-center">
-              <i class="icon-play"></i>
+              <i
+                @click="togglePlaying"
+                :class="playIcon"
+              ></i>
             </div>
             <div class="icon i-right">
               <i class="icon-next"></i>
@@ -63,44 +76,73 @@
         </div>
       </div>
     </transition>
-    <div
-      class="mini-player"
-      v-show="!fullScreen"
-      @click="open"
-    >
-      <div class="icon">
-        <img
-          width="40"
-          height="40"
-        >
+    <transition name="mini">
+      <div
+        class="mini-player"
+        v-show="!fullScreen"
+        @click="open"
+      >
+        <div class="icon">
+          <div class="imgWrapper">
+            <img
+              :src="currentSong.image"
+              :class="cdCls"
+              width="40"
+              height="40"
+            >
+          </div>
+        </div>
+        <div class="text">
+          <h2
+            class="name"
+            v-html="currentSong.name"
+          ></h2>
+          <p
+            class="desc"
+            v-html="currentSong.singer"
+          ></p>
+        </div>
+        <div class="control">
+          <i
+            @click.stop="togglePlaying"
+            :class="miniIcon"
+          ></i>
+        </div>
+        <div class="control">
+          <i class="icon-playlist"></i>
+        </div>
       </div>
-      <div class="text">
-        <h2
-          class="name"
-          v-html="currentSong.name"
-        ></h2>
-        <p
-          class="desc"
-          v-html="currentSong.singer"
-        ></p>
-      </div>
-      <div class="control"></div>
-      <div class="control">
-        <i class="icon-playlist"></i>
-      </div>
-    </div>
+    </transition>
+    <audio
+      ref="audio"
+      :src="currentSong.url"
+    ></audio>
   </div>
 </template>
 
 <script type='text/ecmascript-6'>
 import { mapGetters, mapMutations } from 'vuex'
+import animations from 'create-keyframe-animation'
+import { prefixStyle } from 'common/js/dom'
+
+const transform = prefixStyle('transform')
 
 export default {
   computed: {
+    cdCls() {
+      return this.playing ? 'play' : 'play pause'
+    },
+    playIcon() {
+      return this.playing ? 'icon-pause' : 'icon-play'
+    },
+    miniIcon() {
+      return this.playing ? 'icon-pause-mini' : 'icon-play-mini'
+    },
     ...mapGetters([
       'fullScreen',
       'playlist',
-      'currentSong'
+      'currentSong',
+      'playing'
     ])
   },
   methods: {
@@ -110,9 +152,81 @@ export default {
     open() {
       this.setFullScreen(true)
     },
+    enter(el, done) {
+      const { x, y, scale } = this._getPosAndScale()
+
+      let animation = {
+        0: {
+          transform: `translate3d(${x}px,${y}px,0) scale(${scale})`
+        },
+        60: {
+          transform: 'translate3d(0,0,0) scale(1.1)'
+        },
+        100: {
+          transform: 'translate3d(0,0,0) scale(1)'
+        }
+      }
+      // 注册animation
+      animations.registerAnimation({
+        name: 'move',
+        animation,
+        presets: {
+          duration: 400,
+          easing: 'linear'
+        }
+      })
+      // 运行animation,接收三个参数(初始dom，动画名，执行done[跳到afterEnter])
+      animations.runAnimation(this.$refs.cdWrapper, 'move', done)
+    },
+    afterEnter() {
+      animations.unregisterAnimation('move')
+      this.$refs.cdWrapper.style.animation = ''
+    },
+    leave(el, done) {
+      this.$refs.cdWrapper.style.transition = 'all 0.4s'
+      const { x, y, scale } = this._getPosAndScale()
+      this.$refs.cdWrapper.style[transform] = `translate3d(${x}px,${y}px,0) scale(${scale})`
+      this.$refs.cdWrapper.addEventListener('transitionend', done)
+    },
+    afterLeave() {
+      this.$refs.cdWrapper.style.transition = ''
+      this.$refs.cdWrapper.style[transform] = ''
+    },
+    togglePlaying() {
+      this.setPlayingState(!this.playing)
+    },
+    _getPosAndScale() {
+      const targetWidth = 40 // 小头像宽度
+      const paddingLeft = 40 // 小头像中心距左边框
+      const paddingBottom = 30 // 小头像中心距下边框
+      const paddingTop = 80 // 大头像中心距上边框
+      const width = window.innerWidth * 0.8 // 大头像宽度是浏览器宽度的百分之80
+      const scale = targetWidth / width // 缩小倍数
+      const x = -(window.innerWidth / 2 - paddingLeft) // x轴偏移
+      const y = window.innerHeight - paddingTop - width / 2 - paddingBottom // y轴偏移
+      return {
+        x,
+        y,
+        scale
+      }
+    },
     ...mapMutations({
-      setFullScreen: 'SET_FULL_SCREEN'
+      setFullScreen: 'SET_FULL_SCREEN',
+      setPlayingState: 'SET_PLAYING_STATE'
     })
+  },
+  watch: {
+    currentSong() {
+      this.$nextTick(() => {
+        this.$refs.audio.play()
+      })
+    },
+    playing(newPlaying) {
+      const audio = this.$refs.audio
+      this.$nextTick(() => {
+        newPlaying ? audio.play() : audio.pause()
+      })
+    }
   }
 }
 </script>
@@ -202,6 +316,8 @@ export default {
               border: 10px solid rgba(255, 255, 255, 0.1)
             .play
               animation: rotate 20s linear infinite
+            .pause
+              animation-play-state: paused
         .playing-lyric-wrapper
           width: 80%
           margin: 30px auto 0 auto
