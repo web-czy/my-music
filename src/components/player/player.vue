@@ -1,5 +1,8 @@
 <template>
-  <div class="player" v-show="playlist.length > 0">
+  <div
+    class="player"
+    v-show="playlist.length > 0"
+  >
     <transition
       name="normal"
       @enter="enter"
@@ -7,22 +10,44 @@
       @leave="leave"
       @after-leave="afterLeave"
     >
-      <div class="normal-player" v-show="fullScreen">
+      <div
+        class="normal-player"
+        v-show="fullScreen"
+      >
         <div class="background">
-          <img width="100%" height="100%" />
+          <img
+            width="100%"
+            height="100%"
+          />
         </div>
         <div class="top">
-          <div class="back" @click="back">
+          <div
+            class="back"
+            @click="back"
+          >
             <i class="icon-back"></i>
           </div>
-          <h1 class="title" v-html="currentSong.name"></h1>
-          <h2 class="subtitle" v-html="currentSong.singer"></h2>
+          <h1
+            class="title"
+            v-html="currentSong.name"
+          ></h1>
+          <h2
+            class="subtitle"
+            v-html="currentSong.singer"
+          ></h2>
         </div>
         <div class="middle">
           <div class="middle-l">
-            <div class="cd-wrapper" ref="cdWrapper">
+            <div
+              class="cd-wrapper"
+              ref="cdWrapper"
+            >
               <div class="cd">
-                <img :src="currentSong.image" class="image" :class="cdCls" />
+                <img
+                  :src="currentSong.image"
+                  class="image"
+                  :class="cdCls"
+                />
               </div>
             </div>
           </div>
@@ -31,7 +56,10 @@
           <div class="progress-wrapper">
             <span class="time time-l">{{ format(currentTime) }}</span>
             <div class="progress-bar-wrapper">
-              <progress-bar></progress-bar>
+              <progress-bar
+                :percent="percent"
+                @percentChange="onProgressBarChange"
+              ></progress-bar>
             </div>
             <span class="time time-r">{{ format(currentSong.duration) }}</span>
           </div>
@@ -39,14 +67,32 @@
             <div class="icon i-left">
               <i class="icon-sequence"></i>
             </div>
-            <div class="icon i-left" :class="disableCls">
-              <i @click="prev" class="icon-prev"></i>
+            <div
+              class="icon i-left"
+              :class="disableCls"
+            >
+              <i
+                @click="prev"
+                class="icon-prev"
+              ></i>
             </div>
-            <div class="icon i-center" :class="disableCls">
-              <i @click="togglePlaying" :class="playIcon"></i>
+            <div
+              class="icon i-center"
+              :class="disableCls"
+            >
+              <i
+                @click="togglePlaying"
+                :class="playIcon"
+              ></i>
             </div>
-            <div class="icon i-right" :class="disableCls">
-              <i @click="next" class="icon-next"></i>
+            <div
+              class="icon i-right"
+              :class="disableCls"
+            >
+              <i
+                @click="next"
+                class="icon-next"
+              ></i>
             </div>
             <div class="icon i-right">
               <i class="icon icon-not-favorite"></i>
@@ -56,7 +102,11 @@
       </div>
     </transition>
     <transition name="mini">
-      <div class="mini-player" v-show="!fullScreen" @click="open">
+      <div
+        class="mini-player"
+        v-show="!fullScreen"
+        @click="open"
+      >
         <div class="icon">
           <div class="imgWrapper">
             <img
@@ -68,11 +118,23 @@
           </div>
         </div>
         <div class="text">
-          <h2 class="name" v-html="currentSong.name"></h2>
-          <p class="desc" v-html="currentSong.singer"></p>
+          <h2
+            class="name"
+            v-html="currentSong.name"
+          ></h2>
+          <p
+            class="desc"
+            v-html="currentSong.singer"
+          ></p>
         </div>
         <div class="control">
-          <i @click.stop="togglePlaying" :class="miniIcon"></i>
+          <progress-circle radius="32">
+            <i
+              @click.stop="togglePlaying"
+              class="icon-mini"
+              :class="miniIcon"
+            ></i>
+          </progress-circle>
         </div>
         <div class="control">
           <i class="icon-playlist"></i>
@@ -94,6 +156,7 @@ import { mapGetters, mapMutations } from 'vuex'
 import animations from 'create-keyframe-animation'
 import { prefixStyle } from 'common/js/dom'
 import ProgressBar from 'base/progress-bar/progress-bar'
+import ProgressCircle from 'base/progress-circle/progress-circle'
 
 const transform = prefixStyle('transform')
 
@@ -116,6 +179,9 @@ export default {
     },
     disableCls() {
       return this.songReady ? '' : 'disable'
+    },
+    percent() {
+      return this.currentTime / this.currentSong.duration
     },
     ...mapGetters([
       'fullScreen',
@@ -222,6 +288,13 @@ export default {
       const second = this._pad(interval % 60)
       return `${minute}:${second}`
     },
+    onProgressBarChange(percent) {
+      const currentTime = this.currentSong.duration * percent
+      this.currentTime = this.$refs.audio.currentTime = currentTime
+      if (!this.playing) {
+        this.togglePlaying()
+      }
+    },
     _pad(num, n = 2) {
       let len = num.toString().length
       while (len < n) {
@@ -265,7 +338,8 @@ export default {
     }
   },
   components: {
-    ProgressBar
+    ProgressBar,
+    ProgressCircle
   }
 }
 </script>
