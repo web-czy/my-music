@@ -18,6 +18,7 @@
           <img
             width="100%"
             height="100%"
+            :src="currentSong.image"
           />
         </div>
         <div class="top">
@@ -61,11 +62,14 @@
                 @percentChange="onProgressBarChange"
               ></progress-bar>
             </div>
-            <span class="time time-r">{{ format(currentSong.duration) }}</span>
+            <span class="time time-r">{{ format(duration) }}</span>
           </div>
           <div class="operators">
-            <div class="icon i-left">
-              <i class="icon-sequence"></i>
+            <div
+              class="icon i-left"
+              @click="changeMode"
+            >
+              <i :class="iconMode"></i>
             </div>
             <div
               class="icon i-left"
@@ -128,7 +132,10 @@
           ></p>
         </div>
         <div class="control">
-          <progress-circle radius="32">
+          <progress-circle
+            :radius="radius"
+            :percent="percent"
+          >
             <i
               @click.stop="togglePlaying"
               class="icon-mini"
@@ -147,6 +154,7 @@
       @canplay="ready"
       @error="error"
       @timeupdate="updateTime"
+      @ended="end"
     ></audio>
   </div>
 </template>
@@ -157,6 +165,9 @@ import animations from 'create-keyframe-animation'
 import { prefixStyle } from 'common/js/dom'
 import ProgressBar from 'base/progress-bar/progress-bar'
 import ProgressCircle from 'base/progress-circle/progress-circle'
+import { playMode } from 'common/js/config'
+import { shuffle } from 'common/js/util'
+import Lyric from 'lyric-parser'
 
 const transform = prefixStyle('transform')
 
@@ -164,7 +175,10 @@ export default {
   data() {
     return {
       songReady: false,
-      currentTime: 0
+      currentTime: 0,
+      duration: 0,
+      radius: 32,
+      currentLyric: null
     }
   },
   computed: {
@@ -174,6 +188,9 @@ export default {
     playIcon() {
       return this.playing ? 'icon-pause' : 'icon-play'
     },
+    iconMode() {
+      return this.mode === playMode.sequence ? 'icon-sequence' : this.mode === playMode.loop ? 'icon-loop' : 'icon-random'
+    },
     miniIcon() {
       return this.playing ? 'icon-pause-mini' : 'icon-play-mini'
     },
@@ -181,14 +198,16 @@ export default {
       return this.songReady ? '' : 'disable'
     },
     percent() {
-      return this.currentTime / this.currentSong.duration
+      return this.currentTime / this.duration
     },
     ...mapGetters([
       'fullScreen',
       'playlist',
       'currentSong',
       'playing',
-      'currentIndex'
+      'currentIndex',
+      'mode',
+      'sequenceList'
     ])
   },
   methods: {
@@ -244,10 +263,23 @@ export default {
       }
       this.setPlayingState(!this.playing)
     },
+    end() {
+      this.currentTime = 0
+      if (this.mode === playMode.loop) {
+        this.loop()
+      } else {
+        this.next()
+      }
+    },
+    loop() {
+      this.$refs.audio.currentTime = 0
+      this.$refs.audio.play()
+    },
     prev() {
       if (!this.songReady) {
         return
       }
+      this.currentTime = 0
       let index = this.currentIndex - 1
       if (index === -1) {
         index = this.currentIndex.length - 1
@@ -262,6 +294,7 @@ export default {
       if (!this.songReady) {
         return
       }
+      this.currentTime = 0
       let index = this.currentIndex + 1
       if (index === this.playlist.length) {
         index = 0
@@ -274,6 +307,7 @@ export default {
     },
     ready() {
       this.songReady = true
+      this.duration = this.$refs.audio.duration
     },
     error() {
       // 在歌曲地址出现错误或其他错误时，不会导致所有按钮不能点击
@@ -289,11 +323,37 @@ export default {
       return `${minute}:${second}`
     },
     onProgressBarChange(percent) {
-      const currentTime = this.currentSong.duration * percent
+      const currentTime = this.duration * percent
       this.currentTime = this.$refs.audio.currentTime = currentTime
       if (!this.playing) {
         this.togglePlaying()
       }
+    },
+    changeMode() {
+      // 这里对3取余，就是当this.mode+1=3的时候，让它等于0
+      const mode = (this.mode + 1) % 3
+      this.setPlayMode(mode)
+      let list = null
+      if (mode === playMode.random) {
+        list = shuffle(this.sequenceList)
+      } else {
+        list = this.sequenceList
+      }
+      this.resetCurrentIndex(list)
+      this.setPlayList(list)
+    },
+    // 切换模式后，当前播放歌曲不变
+    resetCurrentIndex(list) {
+      let index = list.findIndex((item) => {
+        return item.id === this.currentSong.id
+      })
+      this.setCurrentIndex(index)
+    },
+    getLyric() {
+      this.currentSong.getLyric().then((lyric) => {
+        this.currentLyric = new Lyric(lyric)
+        console.log(this.currentLyric)
+      })
     },
     _pad(num, n = 2) {
       let len = num.toString().length
@@ -321,13 +381,19 @@ export default {
     ...mapMutations({
       setFullScreen: 'SET_FULL_SCREEN',
       setPlayingState: 'SET_PLAYING_STATE',
-      setCurrentIndex: 'SET_CURRNET_INDEX'
+      setCurrentIndex: 'SET_CURRENT_INDEX',
+      setPlayMode: 'SET_PLAY_MODE',
+      setPlayList: 'SET_PLAYLIST'
     })
   },
   watch: {
-    currentSong() {
+    currentSong(newSong, oldSong) {
+      if (newSong.id === oldSong.id) {
+        return
+      }
       this.$nextTick(() => {
         this.$refs.audio.play()
+        this.getLyric()
       })
     },
     playing(newPlaying) {
