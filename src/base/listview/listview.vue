@@ -1,27 +1,52 @@
 <template>
-  <scroll class="listview" :data="data" :probe-type="probeType" :listenScroll="listenScroll" ref="listview"
-    @scroll="scroll">
+  <scroll
+    class="listview"
+    :data="data"
+    :probe-type="probeType"
+    :listenScroll="listenScroll"
+    ref="listview"
+    @scroll="scroll"
+  >
     <ul>
-      <li v-for="group in data" :key="group.title" class="list-group list-group-hook" ref="listGroup">
-        <h2 class="list-group-title">{{group.title}}</h2>
+      <li
+        v-for="group in data"
+        :key="group.title"
+        class="list-group list-group-hook"
+        ref="listGroup"
+      >
+        <h2 class="list-group-title">{{ group.title }}</h2>
         <ul>
-          <li @click="selectItem(item)" v-for="item in group.items" :key="item.id" class="list-group-item">
+          <li
+            @click="selectItem(item)"
+            v-for="item in group.items"
+            :key="item.id"
+            class="list-group-item"
+          >
             <img class="avatar" v-lazy="item.avatar" />
-            <span class="name">{{item.name}}</span>
+            <span class="name">{{ item.name }}</span>
           </li>
         </ul>
       </li>
     </ul>
-    <div class="list-shortcut" @touchstart="onShortcutTouchStart" @touchmove.stop.prevent="onShortcutTouchMove">
+    <div
+      class="list-shortcut"
+      @touchstart="onShortcutTouchStart"
+      @touchmove.stop.prevent="onShortcutTouchMove"
+    >
       <ul>
-        <li v-for="(item, index) in shortcutList" :key="index" :data-index="index"
-          :class="{'current': currentIndex === index}" class="item">
-          {{item}}
+        <li
+          v-for="(item, index) in shortcutList"
+          :key="index"
+          :data-index="index"
+          :class="{ current: currentIndex === index }"
+          class="item"
+        >
+          {{ item }}
         </li>
       </ul>
     </div>
     <div class="list-fixed" ref="listFixed" v-show="fixedTitle">
-      <h1 class="fixed-title">{{fixedTitle}}</h1>
+      <h1 class="fixed-title">{{ fixedTitle }}</h1>
     </div>
     <div v-show="!data.length" class="loading-container">
       <loading></loading>
@@ -95,6 +120,9 @@ export default {
       let delta = (this.touch.y2 - this.touch.y1) / ANCHOR_HEIGHT | 0
       let anchorIndex = parseInt(this.touch.anchorIndex) + delta
       this._scrollTo(anchorIndex)
+    },
+    refresh() {
+      this.$refs.listview.refresh()
     },
     scroll(pos) {
       this.scrollY = pos.y

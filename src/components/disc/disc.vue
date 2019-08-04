@@ -1,15 +1,15 @@
 <template>
-  <transition appear name="slide">
-    <music-list :bg-image="bgImage" :songs="songs" :title="title"></music-list>
+  <transition name="slide">
+    <music-list :title="title" :songs="songs" :bgImage="bgImage"></music-list>
   </transition>
 </template>
 
 <script type='text/ecmascript-6'>
+import MusicList from 'components/music-list/music-list'
 import { mapGetters } from 'vuex'
-import { getSingerDetail } from 'api/singer'
+import { getSongList } from 'api/recommend'
 import { ERR_OK } from 'api/config'
 import { createSong, isValidMusic, processSongsUrl } from 'common/js/song'
-import MusicList from 'components/music-list/music-list'
 
 export default {
   data() {
@@ -18,31 +18,29 @@ export default {
     }
   },
   computed: {
-    ...mapGetters([
-      'singer'
-    ]),
-    bgImage() {
-      return this.singer.avatar
-    },
     title() {
-      return this.singer.name
-    }
+      return this.disc.dissname
+    },
+    bgImage() {
+      return this.disc.imgurl
+    },
+    ...mapGetters([
+      'disc'
+    ])
   },
   created() {
-    this._getDetail()
-    // console.log(this.singer)
+    this._getSongList(this.disc.dissid)
   },
   methods: {
-    _getDetail() {
-      // 如果直接在歌手详情页刷新了，vuex里边的singer就是个空对象
-      // 所以需要回退到歌手列表的路由页面，重新进入（边界处理例子）
-      if (!this.singer.id) {
-        this.$router.push('/singer')
+    _getSongList(id) {
+      if (!this.disc.dissid) {
+        this.$router.push('/recommend')
         return
       }
-      getSingerDetail(this.singer.id).then((res) => {
+      getSongList(id).then((res) => {
         if (res.code === ERR_OK) {
-          processSongsUrl(this._normalizeSongs(res.data.list)).then((songs) => {
+          console.log(res.cdlist[0].songlist)
+          processSongsUrl(this._normalizeSongs(res.cdlist[0].songlist)).then((songs) => {
             this.songs = songs
           })
         }
@@ -51,7 +49,7 @@ export default {
     _normalizeSongs(list) {
       let ret = []
       list.forEach((item) => {
-        let { musicData } = item
+        let musicData = item
         if (isValidMusic(musicData)) {
           ret.push(createSong(musicData))
         }

@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="player"
-    v-show="playlist.length > 0"
-  >
+  <div class="player" v-show="playlist.length > 0">
     <transition
       name="normal"
       @enter="enter"
@@ -10,32 +7,16 @@
       @leave="leave"
       @after-leave="afterLeave"
     >
-      <div
-        class="normal-player"
-        v-show="fullScreen"
-      >
+      <div class="normal-player" v-show="fullScreen">
         <div class="background">
-          <img
-            width="100%"
-            height="100%"
-            :src="currentSong.image"
-          />
+          <img width="100%" height="100%" :src="currentSong.image" />
         </div>
         <div class="top">
-          <div
-            class="back"
-            @click="back"
-          >
+          <div class="back" @click="back">
             <i class="icon-back"></i>
           </div>
-          <h1
-            class="title"
-            v-html="currentSong.name"
-          ></h1>
-          <h2
-            class="subtitle"
-            v-html="currentSong.singer"
-          ></h2>
+          <h1 class="title" v-html="currentSong.name"></h1>
+          <h2 class="subtitle" v-html="currentSong.singer"></h2>
         </div>
         <div
           class="middle"
@@ -44,20 +25,13 @@
           @touchend="middleTouchEnd"
         >
           <div class="middle-l" ref="middleL">
-            <div
-              class="cd-wrapper"
-              ref="cdWrapper"
-            >
+            <div class="cd-wrapper" ref="cdWrapper">
               <div class="cd">
-                <img
-                  :src="currentSong.image"
-                  class="image"
-                  :class="cdCls"
-                />
+                <img :src="currentSong.image" class="image" :class="cdCls" />
               </div>
             </div>
             <div class="playing-lyric-wrapper">
-              <div class="playing-lyric">{{playingLyric}}</div>
+              <div class="playing-lyric">{{ playingLyric }}</div>
             </div>
           </div>
           <scroll
@@ -70,23 +44,22 @@
                 <p
                   ref="lyricLine"
                   class="text"
-                  :class="{'current':currentLineNum === index}"
+                  :class="{ current: currentLineNum === index }"
                   v-for="(line, index) in currentLyric.lines"
                   :key="index"
-                >{{line.txt}}</p>
+                >
+                  {{ line.txt }}
+                </p>
               </div>
             </div>
           </scroll>
         </div>
         <div class="bottom">
           <div class="dot-wrapper">
+            <span class="dot" :class="{ active: currentShow === 'cd' }"></span>
             <span
               class="dot"
-              :class="{'active':currentShow === 'cd'}"
-            ></span>
-            <span
-              class="dot"
-              :class="{'active':currentShow === 'lyric'}"
+              :class="{ active: currentShow === 'lyric' }"
             ></span>
           </div>
           <div class="progress-wrapper">
@@ -100,38 +73,17 @@
             <span class="time time-r">{{ format(duration) }}</span>
           </div>
           <div class="operators">
-            <div
-              class="icon i-left"
-              @click="changeMode"
-            >
+            <div class="icon i-left" @click="changeMode">
               <i :class="iconMode"></i>
             </div>
-            <div
-              class="icon i-left"
-              :class="disableCls"
-            >
-              <i
-                @click="prev"
-                class="icon-prev"
-              ></i>
+            <div class="icon i-left" :class="disableCls">
+              <i @click="prev" class="icon-prev"></i>
             </div>
-            <div
-              class="icon i-center"
-              :class="disableCls"
-            >
-              <i
-                @click="togglePlaying"
-                :class="playIcon"
-              ></i>
+            <div class="icon i-center" :class="disableCls">
+              <i @click="togglePlaying" :class="playIcon"></i>
             </div>
-            <div
-              class="icon i-right"
-              :class="disableCls"
-            >
-              <i
-                @click="next"
-                class="icon-next"
-              ></i>
+            <div class="icon i-right" :class="disableCls">
+              <i @click="next" class="icon-next"></i>
             </div>
             <div class="icon i-right">
               <i class="icon icon-not-favorite"></i>
@@ -141,11 +93,7 @@
       </div>
     </transition>
     <transition name="mini">
-      <div
-        class="mini-player"
-        v-show="!fullScreen"
-        @click="open"
-      >
+      <div class="mini-player" v-show="!fullScreen" @click="open">
         <div class="icon">
           <div class="imgWrapper">
             <img
@@ -157,17 +105,11 @@
           </div>
         </div>
         <div class="text">
-          <h2
-            class="name"
-            v-html="currentSong.name"
-          ></h2>
+          <h2 class="name" v-html="currentSong.name"></h2>
           <p class="desc" v-html="currentSong.singer"></p>
         </div>
         <div class="control">
-          <progress-circle
-            :radius="radius"
-            :percent="percent"
-          >
+          <progress-circle :radius="radius" :percent="percent">
             <i
               @click.stop="togglePlaying"
               class="icon-mini"
@@ -229,7 +171,11 @@ export default {
       return this.playing ? 'icon-pause' : 'icon-play'
     },
     iconMode() {
-      return this.mode === playMode.sequence ? 'icon-sequence' : this.mode === playMode.loop ? 'icon-loop' : 'icon-random'
+      return this.mode === playMode.sequence
+        ? 'icon-sequence'
+        : this.mode === playMode.loop
+          ? 'icon-loop'
+          : 'icon-random'
     },
     miniIcon() {
       return this.playing ? 'icon-pause-mini' : 'icon-play-mini'
@@ -377,7 +323,7 @@ export default {
     },
     format(interval) {
       interval = interval | 0
-      const minute = interval / 60 | 0
+      const minute = (interval / 60) | 0
       const second = this._pad(interval % 60)
       return `${minute}:${second}`
     },
@@ -407,18 +353,17 @@ export default {
     },
     // 切换模式后，当前播放歌曲不变
     resetCurrentIndex(list) {
-      let index = list.findIndex((item) => {
+      let index = list.findIndex(item => {
         return item.id === this.currentSong.id
       })
       this.setCurrentIndex(index)
     },
     getLyric() {
-      this.currentSong.getLyric().then((lyric) => {
+      this.currentSong.getLyric().then(lyric => {
         this.currentLyric = new Lyric(lyric, this.handleLyric)
         if (this.playing) {
           this.currentLyric.play()
         }
-        console.log(this.currentLyric)
       }).catch(() => {
         this.currentLyric = null
         this.playingLyric = ''
@@ -430,12 +375,14 @@ export default {
         return
       }
       this.currentLineNum = lineNum
-      if (lineNum > 5) { // 5行以后
+      if (lineNum > 5) {
+        // 5行以后
         // 滚动到当前元素，往上偏移第5个的位置
         // 所以第五行是正在播放的文字，用当前播放的行减5就是第一行
         let lineEl = this.$refs.lyricLine[lineNum - 5]
         this.$refs.lyricList.scrollToElement(lineEl, 1000)
-      } else { // 5行之内
+      } else {
+        // 5行之内
         // 滚到顶部
         this.$refs.lyricList.scrollTo(0, 0, 1000)
       }
@@ -465,7 +412,10 @@ export default {
       // 当left为0时左滑，deltaX为负值
       // 当left为负值，屏幕宽度时右滑，deltaX为正值
       // 不能小于屏幕宽度,最大不能超过0
-      const offsetWidth = Math.min(0, Math.max(-window.innerWidth, left + deltaX))
+      const offsetWidth = Math.min(
+        0,
+        Math.max(-window.innerWidth, left + deltaX)
+      )
       this.touch.percent = Math.abs(offsetWidth / window.innerWidth)
       // 由于lyricList是一个vue组件(scroll),不能直接操作vue组件的dom，所以访问$el
       this.$refs.lyricList.$el.style[transform] = `translate3d(${offsetWidth}px, 0, 0)`
@@ -545,6 +495,9 @@ export default {
       }
       if (this.currentLyric) {
         this.currentLyric.stop()
+        this.currentLyric = null
+        this.playingLyric = ''
+        this.currentLineNum = 0
       }
       setTimeout(() => {
         this.$refs.audio.play()
