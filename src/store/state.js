@@ -1,4 +1,4 @@
-import { playMode } from 'common/js/config';
+import { playMode } from 'common/js/config'
 
 const state = {
   singer: {},
@@ -8,7 +8,8 @@ const state = {
   sequenceList: [], // 顺序列表
   mode: playMode.sequence,
   currentIndex: -1,
-  disc: {}
-};
+  disc: {},
+  topList: []
+}
 
-export default state;
+export default state

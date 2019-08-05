@@ -1,10 +1,20 @@
 <template>
   <div class="music-list">
-    <div class="back" @click="back">
+    <div
+      class="back"
+      @click="back"
+    >
       <i class="icon-back"></i>
     </div>
-    <h1 class="title" v-html="title"></h1>
-    <div class="bg-image" :style="bgStyle" ref="bgImage">
+    <h1
+      class="title"
+      v-html="title"
+    ></h1>
+    <div
+      class="bg-image"
+      :style="bgStyle"
+      ref="bgImage"
+    >
       <div class="play-wrapper">
         <div
           class="play"
@@ -16,9 +26,15 @@
           <span class="text">随机播放全部</span>
         </div>
       </div>
-      <div class="filter" ref="filter"></div>
+      <div
+        class="filter"
+        ref="filter"
+      ></div>
     </div>
-    <div class="bg-layer" ref="layer"></div>
+    <div
+      class="bg-layer"
+      ref="layer"
+    ></div>
     <scroll
       @scroll="scroll"
       :probeType="probeType"
@@ -28,9 +44,16 @@
       ref="list"
     >
       <div class="song-list-wrapper">
-        <song-list @select="selectItem" :songs="songs"></song-list>
+        <song-list
+          @select="selectItem"
+          :songs="songs"
+          :rank="rank"
+        ></song-list>
       </div>
-      <div class="loading-container" v-show="!songs.length">
+      <div
+        class="loading-container"
+        v-show="!songs.length"
+      >
         <loading></loading>
       </div>
     </scroll>
@@ -66,6 +89,10 @@ export default {
     title: {
       type: String,
       dafault: ''
+    },
+    rank: {
+      type: Boolean,
+      default: false
     }
   },
   data() {

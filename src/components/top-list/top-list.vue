@@ -1,47 +1,56 @@
 <template>
   <transition name="slide">
-    <music-list :title="title" :songs="songs" :bgImage="bgImage"></music-list>
+    <music-list
+      :title="title"
+      :songs="songs"
+      :bgImage="bgImage"
+      :rank="rank"
+    ></music-list>
   </transition>
 </template>
 
 <script type='text/ecmascript-6'>
 import MusicList from 'components/music-list/music-list'
 import { mapGetters } from 'vuex'
-import { getSongList } from 'api/recommend'
+import { getMusicList } from 'api/rank'
 import { ERR_OK } from 'api/config'
 import { createSong, isValidMusic, processSongsUrl } from 'common/js/song'
 
 export default {
   data() {
     return {
-      songs: []
+      songs: [],
+      rank: true
     }
   },
   computed: {
     title() {
-      return this.disc.dissname
+      return this.topList.topTitle
     },
     bgImage() {
-      return this.disc.imgurl
+      if (this.songs.length) {
+        return this.songs[0].image
+      }
+      return ''
     },
     ...mapGetters([
-      'disc'
+      'topList'
     ])
   },
   created() {
-    this._getSongList(this.disc.dissid)
+    this._getMusicList()
   },
   methods: {
-    _getSongList(id) {
-      if (!this.disc.dissid) {
-        this.$router.push('/recommend')
-        return
+    _getMusicList() {
+      if (!this.topList.id) {
+        this.$router.push('/rank')
       }
-      getSongList(id).then((res) => {
+      getMusicList(this.topList.id).then((res) => {
         if (res.code === ERR_OK) {
-          console.log(this._normalizeSongs(res.cdlist[0].songlist))
-          processSongsUrl(this._normalizeSongs(res.cdlist[0].songlist)).then((songs) => {
+          console.log(res)
+          processSongsUrl(this._normalizeSongs(res.songlist)).then((songs) => {
             this.songs = songs
+            console.log(this.songs)
           })
         }
       })
@@ -49,7 +58,7 @@ export default {
     _normalizeSongs(list) {
       let ret = []
       list.forEach((item) => {
-        let musicData = item
+        const musicData = item.data
         if (isValidMusic(musicData)) {
           ret.push(createSong(musicData))
         }
