@@ -24,6 +24,14 @@ export default {
     data: {
       type: Array,
       default: null
+    },
+    pullup: {
+      type: Boolean,
+      default: false
+    },
+    pulldown: {
+      type: Boolean,
+      default: false
     }
   },
   mounted() {
@@ -46,6 +54,25 @@ export default {
         let me = this
         this.scroll.on('scroll', (pos) => {
           me.$emit('scroll', pos)
+        })
+      }
+
+      if (this.pullup) {
+        this.scroll.on('scrollEnd', () => {
+          // 如果小于这个值，说明快滚动到底部了
+          // 意为滚动到距离最底部50或者更往下的地方，派发事件
+          if (this.scroll.y <= (this.scroll.maxScrollY + 50)) {
+            this.$emit('scrollToEnd')
+          }
+        })
+      }
+
+      if (this.pulldown) {
+        this.scroll.on('scroll', (pos) => {
+          console.log(pos.y)
+          if (pos.y >= 0) {
+            this.$emit('scrollToTop')
+          }
         })
       }
     },

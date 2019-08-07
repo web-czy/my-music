@@ -1,6 +1,18 @@
 <template>
-  <div class="suggest">
+  <scroll
+    class="suggest"
+    :data="result"
+    :pullup="pullup"
+    :pulldown="pulldown"
+    @scrollToEnd="searchMore"
+    @scrollToTop="searchRefresh"
+    ref="suggest"
+  >
     <ul class="suggest-list">
+      <loading
+        v-show="refresh"
+        title=""
+      ></loading>
       <li
         class="suggest-item"
         v-for="(item, index) in result"
@@ -16,16 +28,23 @@
           ></p>
         </div>
       </li>
+      <loading
+        v-show="hasMore"
+        title=""
+      ></loading>
     </ul>
-  </div>
+  </scroll>
 </template>
 
 <script type='text/ecmascript-6'>
 import { search } from 'api/search'
 import { ERR_OK } from 'api/config'
-import { filterSinger } from 'common/js/song'
+import { createSong, isValidMusic, processSongsUrl } from 'common/js/song'
+import Scroll from 'base/scroll/scroll'
+import Loading from 'base/loading/loading'
 
 const TYPE_SINGER = 'singer'
+// perpage每一页返回的歌曲数量
 const perpage = 20
 
 export default {
@@ -42,17 +61,46 @@ export default {
   data() {
     return {
       page: 1,
-      result: []
+      result: [],
+      pullup: true,
+      pulldown: true,
+      hasMore: true,
+      refresh: false
     }
   },
   methods: {
     search() {
+      // 初始化搜索时,页数重置为1,可搜索更多设置为true,scroll复位到0，0
+      this.page = 1
+      this.hasMore = true
+      this.$refs.suggest.scrollTo(0, 0)
       search(this.query, this.page, this.showSinger, perpage).then((res) => {
         if (res.code === ERR_OK) {
-          this.result = this._genResult(res.data)
-          console.log(this.result)
+          this._genResult(res.data).then((result) => {
+            this.result = result
+            this._checkMore(res.data)
+            this._checkLoaded(this.result)
+          })
         }
       })
+    },
+    searchMore() {
+      if (!this.hasMore) {
+        return
+      }
+      this.page++
+      search(this.query, this.page, this.showSinger, perpage).then((res) => {
+        if (res.code === ERR_OK) {
+          this._genResult(res.data).then((result) => {
+            this.result = this.result.concat(result)
+            this._checkMore(res.data)
+          })
+        }
+      })
+    },
+    searchRefresh() {
+      this.refresh = true
+      this.search()
     },
     getIconCls(item) {
       if (item.type === TYPE_SINGER) {
@@ -65,17 +113,39 @@ export default {
       if (item.type === TYPE_SINGER) {
         return item.singername
       } else {
-        return `${item.songname}-${filterSinger(item.singer)}`
+        return `${item.name}-${item.singer}`
+      }
+    },
+    _checkMore(data) {
+      const song = data.song
+      if (!song.list.length || (song.curnum + song.curpage * perpage) >= song.totalnum) {
+        // 如果所有的歌曲都加载完毕，就把hasMore设置为false
+        this.hasMore = false
+      }
+    },
+    _checkLoaded(data) {
+      if (data.length) {
+        this.refresh = false
       }
     },
     _genResult(data) {
       let ret = []
-      if (data.zhida && data.zhida.singerid) {
+      if (data.zhida && data.zhida.singerid && this.page === 1) {
         ret.push({ ...data.zhida, ...{ type: TYPE_SINGER } })
       }
-      if (data.song) {
-        ret = ret.concat(data.song.list)
-      }
+      return processSongsUrl(this._normalizeSongs(data.song.list)).then((songs) => {
+        ret = ret.concat(songs)
+        return ret
+      })
+    },
+    _normalizeSongs(list) {
+      let ret = []
+      list.forEach((item) => {
+        let musicData = item
+        if (isValidMusic(musicData)) {
+          ret.push(createSong(musicData))
+        }
+      })
       return ret
     }
   },
@@ -83,6 +153,10 @@ export default {
     query() {
       this.search()
     }
+  },
+  components: {
+    Scroll,
+    Loading
   }
 }
 </script>
