@@ -22,7 +22,10 @@
             :key="item.id"
             class="list-group-item"
           >
-            <img class="avatar" v-lazy="item.avatar" />
+            <img
+              class="avatar"
+              v-lazy="item.avatar"
+            />
             <span class="name">{{ item.name }}</span>
           </li>
         </ul>
@@ -45,10 +48,17 @@
         </li>
       </ul>
     </div>
-    <div class="list-fixed" ref="listFixed" v-show="fixedTitle">
+    <div
+      class="list-fixed"
+      ref="listFixed"
+      v-show="fixedTitle"
+    >
       <h1 class="fixed-title">{{ fixedTitle }}</h1>
     </div>
-    <div v-show="!data.length" class="loading-container">
+    <div
+      v-show="!data.length"
+      class="loading-container"
+    >
       <loading></loading>
     </div>
   </scroll>
@@ -86,6 +96,7 @@ export default {
   },
   computed: {
     shortcutList() {
+      // 获取右侧列表文字内容，取title的第一个字符
       return this.data.map((group) => {
         return group.title.substr(0, 1)
       })
@@ -159,6 +170,7 @@ export default {
       }, 20)
     },
     scrollY(newY) {
+      console.log(this.data)
       const listHeight = this.listHeight
       // 当滚动到顶部，newY>0
       if (newY > 0) {
@@ -176,7 +188,7 @@ export default {
         }
       }
       // 当滚动到底部，且-newY大于最后一个元素的上限
-      // listHeight有24个元素，列表第23个的索引是22，所以 -2
+      // listHeight有24个元素，列表只有23个元素，列表第23个的索引是22，所以 -2
       this.currentIndex = listHeight.length - 2
     },
     diff(newVal) {

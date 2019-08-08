@@ -102,7 +102,7 @@
                 @percentChange="onProgressBarChange"
               ></progress-bar>
             </div>
-            <span class="time time-r">{{ format(duration) }}</span>
+            <span class="time time-r">{{ format(currentSong.duration) }}</span>
           </div>
           <div class="operators">
             <div
@@ -219,7 +219,6 @@ export default {
     return {
       songReady: false,
       currentTime: 0,
-      duration: 0,
       radius: 32,
       currentLyric: null,
       // 当前歌词所在行
@@ -250,7 +249,7 @@ export default {
       return this.songReady ? '' : 'disable'
     },
     percent() {
-      return this.currentTime / this.duration
+      return this.currentTime / this.currentSong.duration
     },
     ...mapGetters([
       'fullScreen',
@@ -378,7 +377,6 @@ export default {
     },
     ready() {
       this.songReady = true
-      this.duration = this.$refs.audio.duration
     },
     error() {
       // 在歌曲地址出现错误或其他错误时，不会导致所有按钮不能点击
@@ -395,7 +393,7 @@ export default {
     },
     onProgressBarChange(percent) {
       // 播放进度条拖动
-      const currentTime = this.duration * percent
+      const currentTime = this.currentSong.duration * percent
       this.currentTime = this.$refs.audio.currentTime = currentTime
       if (!this.playing) {
         this.togglePlaying()

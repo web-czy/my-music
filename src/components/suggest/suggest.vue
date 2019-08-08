@@ -3,20 +3,17 @@
     class="suggest"
     :data="result"
     :pullup="pullup"
-    :pulldown="pulldown"
+    :beforeScroll="beforeScroll"
     @scrollToEnd="searchMore"
-    @scrollToTop="searchRefresh"
+    @beforeScroll="listScroll"
     ref="suggest"
   >
     <ul class="suggest-list">
-      <loading
-        v-show="refresh"
-        title=""
-      ></loading>
       <li
         class="suggest-item"
         v-for="(item, index) in result"
         :key="index"
+        @click="selectItem(item)"
       >
         <div class="icon">
           <i :class="getIconCls(item)"></i>
@@ -33,6 +30,12 @@
         title=""
       ></loading>
     </ul>
+    <div
+      v-show="!hasMore && !result.length"
+      class="no-result-wrapper"
+    >
+      <no-result title="抱歉，暂无搜索结果"></no-result>
+    </div>
   </scroll>
 </template>
 
@@ -42,6 +45,9 @@ import { ERR_OK } from 'api/config'
 import { createSong, isValidMusic, processSongsUrl } from 'common/js/song'
 import Scroll from 'base/scroll/scroll'
 import Loading from 'base/loading/loading'
+import Singer from 'common/js/singer'
+import { mapMutations, mapActions } from 'vuex'
+import NoResult from 'base/no-result/no-result'
 
 const TYPE_SINGER = 'singer'
 // perpage每一页返回的歌曲数量
@@ -63,9 +69,8 @@ export default {
       page: 1,
       result: [],
       pullup: true,
-      pulldown: true,
-      hasMore: true,
-      refresh: false
+      beforeScroll: true,
+      hasMore: true
     }
   },
   methods: {
@@ -79,7 +84,6 @@ export default {
           this._genResult(res.data).then((result) => {
             this.result = result
             this._checkMore(res.data)
-            this._checkLoaded(this.result)
           })
         }
       })
@@ -98,10 +102,6 @@ export default {
         }
       })
     },
-    searchRefresh() {
-      this.refresh = true
-      this.search()
-    },
     getIconCls(item) {
       if (item.type === TYPE_SINGER) {
         return 'icon-mine'
@@ -116,16 +116,30 @@ export default {
         return `${item.name}-${item.singer}`
       }
     },
+    selectItem(item) {
+      if (item.type === TYPE_SINGER) {
+        let singer = new Singer({
+          id: item.singermid,
+          name: item.singername
+        })
+        this.$router.push({
+          path: `/search/${singer.id}`
+        })
+        this.setSinger(singer)
+        this.haveSinger = true
+      } else {
+        console.log(item)
+        this.insertSong(item)
+      }
+    },
+    listScroll() {
+      this.$emit('listScroll')
+    },
     _checkMore(data) {
       const song = data.song
       if (!song.list.length || (song.curnum + song.curpage * perpage) >= song.totalnum) {
         // 如果所有的歌曲都加载完毕，就把hasMore设置为false
         this.hasMore = false
-      }
-    },
-    _checkLoaded(data) {
-      if (data.length) {
-        this.refresh = false
       }
     },
     _genResult(data) {
@@ -147,7 +161,13 @@ export default {
         }
       })
       return ret
-    }
+    },
+    ...mapMutations({
+      setSinger: 'SET_SINGER'
+    }),
+    ...mapActions([
+      'insertSong'
+    ])
   },
   watch: {
     query() {
@@ -156,7 +176,8 @@ export default {
   },
   components: {
     Scroll,
-    Loading
+    Loading,
+    NoResult
   }
 }
 </script>

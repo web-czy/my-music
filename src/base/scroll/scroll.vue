@@ -29,7 +29,7 @@ export default {
       type: Boolean,
       default: false
     },
-    pulldown: {
+    beforeScroll: {
       type: Boolean,
       default: false
     }
@@ -67,12 +67,9 @@ export default {
         })
       }
 
-      if (this.pulldown) {
-        this.scroll.on('scroll', (pos) => {
-          console.log(pos.y)
-          if (pos.y >= 0) {
-            this.$emit('scrollToTop')
-          }
+      if (this.beforeScroll) {
+        this.scroll.on('beforeScrollStart', () => {
+          this.$emit('beforeScroll')
         })
       }
     },
