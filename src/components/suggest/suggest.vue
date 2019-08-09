@@ -128,9 +128,9 @@ export default {
         this.setSinger(singer)
         this.haveSinger = true
       } else {
-        console.log(item)
         this.insertSong(item)
       }
+      this.$emit('select')
     },
     listScroll() {
       this.$emit('listScroll')

@@ -24,6 +24,25 @@
             </li>
           </ul>
         </div>
+        <div
+          class="search-history"
+          v-show="searchHistory.length"
+        >
+          <h1 class="title">
+            <span class="text">搜索历史</span>
+            <span
+              class="clear"
+              @click="clearSearchHistory"
+            >
+              <i class="icon-clear"></i>
+            </span>
+          </h1>
+          <search-list
+            :searches="searchHistory"
+            @select="addQuery"
+            @delete="deleteSearchHistory"
+          ></search-list>
+        </div>
       </div>
     </div>
     <div
@@ -31,6 +50,7 @@
       v-show="query"
     >
       <suggest
+        @select="saveSearch"
         @listScroll="blurInput"
         :query="query"
       ></suggest>
@@ -41,9 +61,11 @@
 
 <script>
 import SearchBox from 'base/search-box/search-box'
+import Suggest from 'components/suggest/suggest'
+import SearchList from 'base/search-list/search-list'
 import { getHotKey } from 'api/search'
 import { ERR_OK } from 'api/config'
-import Suggest from 'components/suggest/suggest'
+import { mapActions, mapGetters } from 'vuex'
 
 export default {
   created() {
@@ -55,6 +77,11 @@ export default {
       query: ''
     }
   },
+  computed: {
+    ...mapGetters([
+      'searchHistory'
+    ])
+  },
   methods: {
     addQuery(query) {
       this.$refs.searchBox.setQuery(query)
@@ -65,17 +92,27 @@ export default {
     blurInput() {
       this.$refs.searchBox.blur()
     },
+    saveSearch() {
+      this.saveSearchHistory(this.query)
+    },
     _getHotKey() {
       getHotKey().then((res) => {
         if (res.code === ERR_OK) {
           this.hotKey = res.data.hotkey.slice(0, 10)
         }
       })
-    }
+    },
+    ...mapActions([
+      'saveSearchHistory',
+      'insertSong',
+      'deleteSearchHistory',
+      'clearSearchHistory'
+    ])
   },
   components: {
     SearchBox,
-    Suggest
+    Suggest,
+    SearchList
   }
 }
 </script>
