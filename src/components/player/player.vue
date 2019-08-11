@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="player"
-    v-show="playlist.length > 0"
-  >
+  <div class="player" v-show="playlist.length > 0">
     <transition
       name="normal"
       @enter="enter"
@@ -10,32 +7,16 @@
       @leave="leave"
       @after-leave="afterLeave"
     >
-      <div
-        class="normal-player"
-        v-show="fullScreen"
-      >
+      <div class="normal-player" v-show="fullScreen">
         <div class="background">
-          <img
-            width="100%"
-            height="100%"
-            :src="currentSong.image"
-          />
+          <img width="100%" height="100%" :src="currentSong.image" />
         </div>
         <div class="top">
-          <div
-            class="back"
-            @click="back"
-          >
+          <div class="back" @click="back">
             <i class="icon-back"></i>
           </div>
-          <h1
-            class="title"
-            v-html="currentSong.name"
-          ></h1>
-          <h2
-            class="subtitle"
-            v-html="currentSong.singer"
-          ></h2>
+          <h1 class="title" v-html="currentSong.name"></h1>
+          <h2 class="subtitle" v-html="currentSong.singer"></h2>
         </div>
         <div
           class="middle"
@@ -43,20 +24,10 @@
           @touchmove.prevent="middleTouchMove"
           @touchend="middleTouchEnd"
         >
-          <div
-            class="middle-l"
-            ref="middleL"
-          >
-            <div
-              class="cd-wrapper"
-              ref="cdWrapper"
-            >
+          <div class="middle-l" ref="middleL">
+            <div class="cd-wrapper" ref="cdWrapper">
               <div class="cd">
-                <img
-                  :src="currentSong.image"
-                  class="image"
-                  :class="cdCls"
-                />
+                <img :src="currentSong.image" class="image" :class="cdCls" />
               </div>
             </div>
             <div class="playing-lyric-wrapper">
@@ -85,10 +56,7 @@
         </div>
         <div class="bottom">
           <div class="dot-wrapper">
-            <span
-              class="dot"
-              :class="{ active: currentShow === 'cd' }"
-            ></span>
+            <span class="dot" :class="{ active: currentShow === 'cd' }"></span>
             <span
               class="dot"
               :class="{ active: currentShow === 'lyric' }"
@@ -105,38 +73,17 @@
             <span class="time time-r">{{ format(currentSong.duration) }}</span>
           </div>
           <div class="operators">
-            <div
-              class="icon i-left"
-              @click="changeMode"
-            >
+            <div class="icon i-left" @click="changeMode">
               <i :class="iconMode"></i>
             </div>
-            <div
-              class="icon i-left"
-              :class="disableCls"
-            >
-              <i
-                @click="prev"
-                class="icon-prev"
-              ></i>
+            <div class="icon i-left" :class="disableCls">
+              <i @click="prev" class="icon-prev"></i>
             </div>
-            <div
-              class="icon i-center"
-              :class="disableCls"
-            >
-              <i
-                @click="togglePlaying"
-                :class="playIcon"
-              ></i>
+            <div class="icon i-center" :class="disableCls">
+              <i @click="togglePlaying" :class="playIcon"></i>
             </div>
-            <div
-              class="icon i-right"
-              :class="disableCls"
-            >
-              <i
-                @click="next"
-                class="icon-next"
-              ></i>
+            <div class="icon i-right" :class="disableCls">
+              <i @click="next" class="icon-next"></i>
             </div>
             <div class="icon i-right">
               <i class="icon icon-not-favorite"></i>
@@ -146,11 +93,7 @@
       </div>
     </transition>
     <transition name="mini">
-      <div
-        class="mini-player"
-        v-show="!fullScreen"
-        @click="open"
-      >
+      <div class="mini-player" v-show="!fullScreen" @click="open">
         <div class="icon">
           <div class="imgWrapper">
             <img
@@ -162,20 +105,11 @@
           </div>
         </div>
         <div class="text">
-          <h2
-            class="name"
-            v-html="currentSong.name"
-          ></h2>
-          <p
-            class="desc"
-            v-html="currentSong.singer"
-          ></p>
+          <h2 class="name" v-html="currentSong.name"></h2>
+          <p class="desc" v-html="currentSong.singer"></p>
         </div>
         <div class="control">
-          <progress-circle
-            :radius="radius"
-            :percent="percent"
-          >
+          <progress-circle :radius="radius" :percent="percent">
             <i
               @click.stop="togglePlaying"
               class="icon-mini"
@@ -183,11 +117,12 @@
             ></i>
           </progress-circle>
         </div>
-        <div class="control">
+        <div class="control" @click="showPlaylist">
           <i class="icon-playlist"></i>
         </div>
       </div>
     </transition>
+    <playlist ref="playlist"></playlist>
     <audio
       ref="audio"
       :src="currentSong.url"
@@ -210,6 +145,7 @@ import { playMode } from 'common/js/config'
 import { shuffle } from 'common/js/util'
 import Lyric from 'lyric-parser'
 import Scroll from 'base/scroll/scroll'
+import Playlist from 'components/playlist/playlist'
 
 const transform = prefixStyle('transform')
 const transitionDuration = prefixStyle('transition-duration')
@@ -452,6 +388,9 @@ export default {
       }
       this.playingLyric = txt
     },
+    showPlaylist() {
+      this.$refs.playlist.show()
+    },
     middleTouchStart(e) {
       this.touch.initiated = true
       const touch = e.touches[0]
@@ -578,7 +517,8 @@ export default {
   components: {
     ProgressBar,
     ProgressCircle,
-    Scroll
+    Scroll,
+    Playlist
   }
 }
 </script>
