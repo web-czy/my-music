@@ -1,21 +1,10 @@
 <template>
   <div class="search">
     <div class="search-box-wrapper">
-      <search-box
-        ref="searchBox"
-        @query="onQueryChange"
-      ></search-box>
+      <search-box ref="searchBox" @query="onQueryChange"></search-box>
     </div>
-    <div
-      class="shortcut-wrapper"
-      ref="shortcutWrapper"
-      v-show="!query"
-    >
-      <scroll
-        class="shortcut"
-        :data="shortcut"
-        ref="shortcut"
-      >
+    <div class="shortcut-wrapper" ref="shortcutWrapper" v-show="!query">
+      <scroll class="shortcut" :data="shortcut" ref="shortcut">
         <div>
           <div class="hot-key">
             <h1 class="title">热门搜索</h1>
@@ -30,16 +19,10 @@
               </li>
             </ul>
           </div>
-          <div
-            class="search-history"
-            v-show="searchHistory.length"
-          >
+          <div class="search-history" v-show="searchHistory.length">
             <h1 class="title">
               <span class="text">搜索历史</span>
-              <span
-                class="clear"
-                @click="showConfirm"
-              >
+              <span class="clear" @click="showConfirm">
                 <i class="icon-clear"></i>
               </span>
             </h1>
@@ -52,11 +35,7 @@
         </div>
       </scroll>
     </div>
-    <div
-      class="search-result"
-      ref="searchResult"
-      v-show="query"
-    >
+    <div class="search-result" ref="searchResult" v-show="query">
       <suggest
         ref="suggest"
         @select="saveSearch"
@@ -115,8 +94,8 @@ export default {
     addQuery(query) {
       this.$refs.searchBox.setQuery(query)
     },
-    onQueryChange(newquery) {
-      this.query = newquery
+    onQueryChange(newQuery) {
+      this.query = newQuery
     },
     blurInput() {
       this.$refs.searchBox.blur()

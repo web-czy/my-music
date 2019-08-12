@@ -1,35 +1,34 @@
 <template>
   <transition name="slide">
-    <div
-      class="add-song"
-      v-show="showFlag"
-      @click.stop
-    >
+    <div class="add-song" v-show="showFlag" @click.stop>
       <div class="header">
         <h1 class="title">添加歌曲到列表</h1>
-        <div
-          class="close"
-          @click="hide"
-        >
+        <div class="close" @click="hide">
           <i class="icon-close"></i>
         </div>
       </div>
       <div class="search-box-wrapper">
-        <search-box placeholder="搜索歌曲"></search-box>
+        <search-box placeholder="搜索歌曲" @query="onQueryChange"></search-box>
       </div>
-      <div class="shortcut"></div>
-      <div class="search-result"></div>
+      <div class="shortcut" v-show="!query"></div>
+      <div class="search-result" v-show="query">
+        <suggest :query="query" :showSinger="showSinger"></suggest>
+      </div>
     </div>
   </transition>
 </template>
 
 <script type='text/ecmascript-6'>
 import SearchBox from 'base/search-box/search-box'
+import SearchList from 'base/search-list/search-list'
+import Suggest from 'components/suggest/suggest'
 
 export default {
   data() {
     return {
-      showFlag: false
+      showFlag: false,
+      query: '',
+      showSinger: false
     }
   },
   methods: {
@@ -38,10 +37,15 @@ export default {
     },
     hide() {
       this.showFlag = false
+    },
+    onQueryChange(newQuery) {
+      this.query = newQuery
     }
   },
   components: {
-    SearchBox
+    SearchBox,
+    SearchList,
+    Suggest
   }
 }
 </script>
