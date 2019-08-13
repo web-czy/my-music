@@ -204,7 +204,7 @@
 </template>
 
 <script type='text/ecmascript-6'>
-import { mapGetters, mapMutations } from 'vuex'
+import { mapGetters, mapMutations, mapActions } from 'vuex'
 import * as types from '../../store/mutation-types'
 import animations from 'create-keyframe-animation'
 import { prefixStyle } from 'common/js/dom'
@@ -372,6 +372,7 @@ export default {
     },
     ready() {
       this.songReady = true
+      this.savePlayHistory(this.currentSong)
     },
     error() {
       // 在歌曲地址出现错误或其他错误时，不会导致所有按钮不能点击
@@ -524,7 +525,10 @@ export default {
     },
     ...mapMutations({
       setFullScreen: types.SET_FULL_SCREEN
-    })
+    }),
+    ...mapActions([
+      'savePlayHistory'
+    ])
   },
   watch: {
     currentSong(newSong, oldSong) {

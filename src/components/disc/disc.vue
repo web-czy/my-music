@@ -1,6 +1,10 @@
 <template>
   <transition name="slide">
-    <music-list :title="title" :songs="songs" :bgImage="bgImage"></music-list>
+    <music-list
+      :title="title"
+      :songs="songs"
+      :bgImage="bgImage"
+    ></music-list>
   </transition>
 </template>
 
@@ -39,7 +43,6 @@ export default {
       }
       getSongList(id).then((res) => {
         if (res.code === ERR_OK) {
-          console.log(this._normalizeSongs(res.cdlist[0].songlist))
           processSongsUrl(this._normalizeSongs(res.cdlist[0].songlist)).then((songs) => {
             this.songs = songs
           })

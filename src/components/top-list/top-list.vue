@@ -47,10 +47,8 @@ export default {
       }
       getMusicList(this.topList.id).then((res) => {
         if (res.code === ERR_OK) {
-          console.log(res)
           processSongsUrl(this._normalizeSongs(res.songlist)).then((songs) => {
             this.songs = songs
-            console.log(this.songs)
           })
         }
       })

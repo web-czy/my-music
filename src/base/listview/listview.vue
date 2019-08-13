@@ -170,7 +170,6 @@ export default {
       }, 20)
     },
     scrollY(newY) {
-      console.log(this.data)
       const listHeight = this.listHeight
       // 当滚动到顶部，newY>0
       if (newY > 0) {

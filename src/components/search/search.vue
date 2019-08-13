@@ -1,10 +1,22 @@
 <template>
   <div class="search">
     <div class="search-box-wrapper">
-      <search-box ref="searchBox" @query="onQueryChange"></search-box>
+      <search-box
+        ref="searchBox"
+        @query="onQueryChange"
+      ></search-box>
     </div>
-    <div class="shortcut-wrapper" ref="shortcutWrapper" v-show="!query">
-      <scroll class="shortcut" :data="shortcut" ref="shortcut">
+    <div
+      class="shortcut-wrapper"
+      ref="shortcutWrapper"
+      v-show="!query"
+    >
+      <scroll
+        class="shortcut"
+        :refreshDelay="refreshDelay"
+        :data="shortcut"
+        ref="shortcut"
+      >
         <div>
           <div class="hot-key">
             <h1 class="title">热门搜索</h1>
@@ -19,10 +31,16 @@
               </li>
             </ul>
           </div>
-          <div class="search-history" v-show="searchHistory.length">
+          <div
+            class="search-history"
+            v-show="searchHistory.length"
+          >
             <h1 class="title">
               <span class="text">搜索历史</span>
-              <span class="clear" @click="showConfirm">
+              <span
+                class="clear"
+                @click="showConfirm"
+              >
                 <i class="icon-clear"></i>
               </span>
             </h1>
@@ -35,7 +53,11 @@
         </div>
       </scroll>
     </div>
-    <div class="search-result" ref="searchResult" v-show="query">
+    <div
+      class="search-result"
+      ref="searchResult"
+      v-show="query"
+    >
       <suggest
         ref="suggest"
         @select="saveSearch"
@@ -61,27 +83,23 @@ import Confirm from 'base/confirm/confirm'
 import Scroll from 'base/scroll/scroll'
 import { getHotKey } from 'api/search'
 import { ERR_OK } from 'api/config'
-import { mapActions, mapGetters } from 'vuex'
-import { playlistMixin } from 'common/js/mixin'
+import { mapActions } from 'vuex'
+import { playlistMixin, searchMixin } from 'common/js/mixin'
 
 export default {
-  mixins: [playlistMixin],
+  mixins: [playlistMixin, searchMixin],
   created() {
     this._getHotKey()
   },
   data() {
     return {
-      hotKey: [],
-      query: ''
+      hotKey: []
     }
   },
   computed: {
     shortcut() {
       return this.hotKey.concat(this.searchHistory)
-    },
-    ...mapGetters([
-      'searchHistory'
-    ])
+    }
   },
   methods: {
     handlePlaylist(playlist) {
@@ -90,18 +108,6 @@ export default {
       this.$refs.searchResult.style.bottom = bottom
       this.$refs.shortcut.refresh()
       this.$refs.suggest.refresh()
-    },
-    addQuery(query) {
-      this.$refs.searchBox.setQuery(query)
-    },
-    onQueryChange(newQuery) {
-      this.query = newQuery
-    },
-    blurInput() {
-      this.$refs.searchBox.blur()
-    },
-    saveSearch() {
-      this.saveSearchHistory(this.query)
     },
     showConfirm() {
       this.$refs.confirm.show()
@@ -114,9 +120,6 @@ export default {
       })
     },
     ...mapActions([
-      'saveSearchHistory',
-      'insertSong',
-      'deleteSearchHistory',
       'clearSearchHistory'
     ])
   },
