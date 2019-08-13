@@ -1,16 +1,9 @@
 <template>
   <transition name="slide">
-    <div
-      class="add-song"
-      v-show="showFlag"
-      @click.stop
-    >
+    <div class="add-song" v-show="showFlag" @click.stop>
       <div class="header">
         <h1 class="title">添加歌曲到列表</h1>
-        <div
-          class="close"
-          @click="hide"
-        >
+        <div class="close" @click="hide">
           <i class="icon-close"></i>
         </div>
       </div>
@@ -21,10 +14,7 @@
           @query="onQueryChange"
         ></search-box>
       </div>
-      <div
-        class="shortcut"
-        v-show="!query"
-      >
+      <div class="shortcut" v-show="!query">
         <switches
           :switches="switches"
           :currentIndex="currentIndex"
@@ -62,10 +52,7 @@
           </scroll>
         </div>
       </div>
-      <div
-        class="search-result"
-        v-show="query"
-      >
+      <div class="search-result" v-show="query">
         <suggest
           :query="query"
           :showSinger="showSinger"
@@ -73,10 +60,7 @@
           @listScroll="blurInput"
         ></suggest>
       </div>
-      <top-tip
-        ref="topTip"
-        class="tip-title"
-      >
+      <top-tip ref="topTip" class="tip-title">
         <i class="icon-ok"></i>
         <span class="text">1首歌曲已添加到播放队列</span>
       </top-tip>
@@ -112,8 +96,7 @@ export default {
   },
   computed: {
     ...mapGetters([
-      'playHistory',
-      'searchHistory'
+      'playHistory'
     ])
   },
   methods: {
