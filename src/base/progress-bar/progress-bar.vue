@@ -1,14 +1,7 @@
  <template>
-  <div
-    class="progress-bar"
-    ref="progressBar"
-    @click="progressClick"
-  >
+  <div class="progress-bar" ref="progressBar" @click="progressClick">
     <div class="bar-inner">
-      <div
-        class="progress"
-        ref="progress"
-      ></div>
+      <div class="progress" ref="progress"></div>
       <div
         class="progress-btn-wrapper"
         ref="progressBtn"
@@ -55,6 +48,8 @@ export default {
       const leftWidth = this.$refs.progressBar.clientWidth - progressBtnWidth
       const offsetWidth = Math.min(leftWidth, Math.max(0, this.touch.left + deltaX))
       this._offset(offsetWidth)
+      // 派发这个事件是为了拖动的时候，显示的歌曲播放时间也跟随改变
+      this.$emit('percentChanging', this._getPercent())
     },
     progressTouchEnd() {
       this.touch.initiated = false
@@ -67,6 +62,13 @@ export default {
       // 这里当我们点击 progressBtn 的时候，e.offsetX 获取不对
       // this._offset(e.offsetX)
       this._triggerPercent()
+    },
+    setProgressOffset(percent) {
+      if (percent >= 0 && !this.touch.initiated) { // 当比例大于零且没有在move
+        const barWidth = this.$refs.progressBar.clientWidth - progressBtnWidth
+        const offsetWidth = Math.floor(barWidth * percent)
+        this._offset(offsetWidth)
+      }
     },
     _triggerPercent() {
       this.$emit('percentChange', this._getPercent())
@@ -82,11 +84,7 @@ export default {
   },
   watch: {
     percent(newPercent) { // 进度条比例
-      if (newPercent >= 0 && !this.touch.initiated) { // 当比例大于零且没有在move
-        const barWidth = this.$refs.progressBar.clientWidth - progressBtnWidth
-        const offsetWidth = Math.floor(barWidth * newPercent)
-        this._offset(offsetWidth)
-      }
+      this.setProgressOffset(newPercent)
     }
   }
 }

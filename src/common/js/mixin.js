@@ -35,6 +35,9 @@ export const playerMixin = {
         ? 'icon-loop'
         : 'icon-random';
     },
+    favoriteIcon() {
+      return this.getFavoriteIcon(this.currentSong);
+    },
     ...mapGetters([
       'playlist',
       'sequenceList',

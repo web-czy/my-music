@@ -1,27 +1,15 @@
 <template>
   <div class="tab">
-    <router-link
-      class="tab-item"
-      to="/recommend"
-    >
+    <router-link class="tab-item" to="/recommend">
       <span class="tab-link">推荐</span>
     </router-link>
-    <router-link
-      class="tab-item"
-      to="/singer"
-    >
+    <router-link class="tab-item" to="/singer">
       <span class="tab-link">歌手</span>
     </router-link>
-    <router-link
-      class="tab-item"
-      to="/rank"
-    >
+    <router-link class="tab-item" to="/rank">
       <span class="tab-link">排行</span>
     </router-link>
-    <router-link
-      class="tab-item"
-      to="/search"
-    >
+    <router-link class="tab-item" to="/search">
       <span class="tab-link">搜索</span>
     </router-link>
   </div>
@@ -40,7 +28,7 @@ export default {
   width: 100%
   height: 44px
   line-height: 44px
-  font-size: $color-text-l
+  font-size: $font-size-medium
   .tab-item
     flex: 1
     color: #fff
