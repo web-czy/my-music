@@ -1,12 +1,26 @@
 <template>
   <transition name="list-fade">
-    <div class="playlist" v-show="showFlag" @click="hide">
-      <div class="list-wrapper" @click.stop>
+    <div
+      class="playlist"
+      v-show="showFlag"
+      @click="hide"
+    >
+      <div
+        class="list-wrapper"
+        @click.stop
+      >
         <div class="list-header">
           <h1 class="title">
-            <i class="icon" :class="iconMode" @click="changeMode"></i>
+            <i
+              class="icon"
+              :class="iconMode"
+              @click="changeMode"
+            ></i>
             <span class="text">{{ modeText }}</span>
-            <span class="clear" @click="showConfirm">
+            <span
+              class="clear"
+              @click="showConfirm"
+            >
               <i class="icon-clear"></i>
             </span>
           </h1>
@@ -17,7 +31,11 @@
           class="list-content"
           ref="listContent"
         >
-          <transition-group ref="list" name="list" tag="ul">
+          <transition-group
+            ref="list"
+            name="list"
+            tag="ul"
+          >
             <li
               ref="listItem"
               class="item"
@@ -25,24 +43,39 @@
               :key="item.id"
               @click="selectItem(item, index)"
             >
-              <i class="current" :class="getCurrentIcon(item)"></i>
+              <i
+                class="current"
+                :class="getCurrentIcon(item)"
+              ></i>
               <span class="text">{{ item.name }}</span>
-              <span class="like">
-                <i class="icon-not-favorite"></i>
+              <span
+                class="like"
+                @click.stop="toggleFavorite(item)"
+              >
+                <i :class="getFavoriteIcon(item)"></i>
               </span>
-              <span class="delete" @click.stop="deleteOne(item)">
+              <span
+                class="delete"
+                @click.stop="deleteOne(item)"
+              >
                 <i class="icon-delete"></i>
               </span>
             </li>
           </transition-group>
         </scroll>
         <div class="list-operate">
-          <div class="add" @click="addSong">
+          <div
+            class="add"
+            @click="addSong"
+          >
             <i class="icon-add"></i>
             <span class="text">添加歌曲到队列</span>
           </div>
         </div>
-        <div class="list-close" @click="hide">
+        <div
+          class="list-close"
+          @click="hide"
+        >
           <span>关闭</span>
         </div>
       </div>
@@ -109,7 +142,6 @@ export default {
       const index = this.sequenceList.findIndex((song) => {
         return current.id === song.id
       })
-      console.log(index)
       this.$refs.listContent.scrollToElement(this.$refs.list.$el.children[index], 300)
     },
     deleteOne(item) {

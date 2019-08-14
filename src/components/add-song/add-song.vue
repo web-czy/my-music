@@ -1,9 +1,16 @@
 <template>
   <transition name="slide">
-    <div class="add-song" v-show="showFlag" @click.stop>
+    <div
+      class="add-song"
+      v-show="showFlag"
+      @click.stop
+    >
       <div class="header">
         <h1 class="title">添加歌曲到列表</h1>
-        <div class="close" @click="hide">
+        <div
+          class="close"
+          @click="hide"
+        >
           <i class="icon-close"></i>
         </div>
       </div>
@@ -14,7 +21,10 @@
           @query="onQueryChange"
         ></search-box>
       </div>
-      <div class="shortcut" v-show="!query">
+      <div
+        class="shortcut"
+        v-show="!query"
+      >
         <switches
           :switches="switches"
           :currentIndex="currentIndex"
@@ -30,7 +40,6 @@
             <div class="list-inner">
               <song-list
                 :songs="playHistory"
-                :rank="rank"
                 @select="selectSong"
               ></song-list>
             </div>
@@ -52,7 +61,10 @@
           </scroll>
         </div>
       </div>
-      <div class="search-result" v-show="query">
+      <div
+        class="search-result"
+        v-show="query"
+      >
         <suggest
           :query="query"
           :showSinger="showSinger"
@@ -60,7 +72,10 @@
           @listScroll="blurInput"
         ></suggest>
       </div>
-      <top-tip ref="topTip" class="tip-title">
+      <top-tip
+        ref="topTip"
+        class="tip-title"
+      >
         <i class="icon-ok"></i>
         <span class="text">1首歌曲已添加到播放队列</span>
       </top-tip>
@@ -90,8 +105,7 @@ export default {
         { name: '最近播放' },
         { name: '搜索历史' }
       ],
-      currentIndex: 0,
-      rank: false
+      currentIndex: 0
     }
   },
   computed: {
@@ -102,13 +116,6 @@ export default {
   methods: {
     show() {
       this.showFlag = true
-      // setTimeout(() => {
-      //   if (this.currentIndex === 0) {
-      //     this.$refs.songList.refresh()
-      //   } else {
-      //     this.$refs.searchList.refresh()
-      //   }
-      // }, 20);
     },
     hide() {
       this.showFlag = false
@@ -122,6 +129,9 @@ export default {
     },
     selectSong(song, index) {
       if (index !== 0) {
+        // 因为songs是playHistory，它的每个元素都是对象
+        // 这个对象并不是Song的实例,因为是从缓存(cache)里取出来的
+        // 只要想添加到播放列表,就要实例化成Song的实例
         this.insertSong(new Song(song))
         this.showTip()
       }
