@@ -79,10 +79,7 @@ export const playerMixin = {
       let index = this.favoriteList.findIndex(item => {
         return song.id === item.id;
       });
-      if (index > -1) {
-        return true;
-      }
-      return false;
+      return index > -1;
     },
     ...mapMutations({
       setPlayingState: types.SET_PLAYING_STATE,
@@ -98,7 +95,7 @@ export const searchMixin = {
   data() {
     return {
       query: '',
-      refreshDelay: 100
+      refreshDelay: 120
     };
   },
   computed: {
@@ -111,8 +108,9 @@ export const searchMixin = {
     saveSearch() {
       this.saveSearchHistory(this.query);
     },
-    onQueryChange(newQuery) {
-      this.query = newQuery;
+    onQueryChange(query) {
+      // 处理带空格的情况
+      this.query = query.trim();
     },
     addQuery(query) {
       this.$refs.searchBox.setQuery(query);

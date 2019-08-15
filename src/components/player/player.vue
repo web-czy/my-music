@@ -1,5 +1,8 @@
 <template>
-  <div class="player" v-show="playlist.length > 0">
+  <div
+    class="player"
+    v-show="playlist.length > 0"
+  >
     <transition
       name="normal"
       @enter="enter"
@@ -7,16 +10,32 @@
       @leave="leave"
       @after-leave="afterLeave"
     >
-      <div class="normal-player" v-show="fullScreen">
+      <div
+        class="normal-player"
+        v-show="fullScreen"
+      >
         <div class="background">
-          <img width="100%" height="100%" :src="currentSong.image" />
+          <img
+            width="100%"
+            height="100%"
+            :src="currentSong.image"
+          />
         </div>
         <div class="top">
-          <div class="back" @click="back">
+          <div
+            class="back"
+            @click="back"
+          >
             <i class="icon-back"></i>
           </div>
-          <h1 class="title" v-html="currentSong.name"></h1>
-          <h2 class="subtitle" v-html="currentSong.singer"></h2>
+          <h1
+            class="title"
+            v-html="currentSong.name"
+          ></h1>
+          <h2
+            class="subtitle"
+            v-html="currentSong.singer"
+          ></h2>
         </div>
         <div
           class="middle"
@@ -24,9 +43,18 @@
           @touchmove.prevent="middleTouchMove"
           @touchend="middleTouchEnd"
         >
-          <div class="middle-l" ref="middleL">
-            <div class="cd-wrapper" ref="cdWrapper">
-              <div class="cd" ref="imageWrapper">
+          <div
+            class="middle-l"
+            ref="middleL"
+          >
+            <div
+              class="cd-wrapper"
+              ref="cdWrapper"
+            >
+              <div
+                class="cd"
+                ref="imageWrapper"
+              >
                 <img
                   ref="image"
                   :class="cdCls"
@@ -49,14 +77,17 @@
                 <p
                   ref="lyricLine"
                   class="text"
-                  :class="{ current: currentLineNum === index }"
+                  :class="{'current': currentLineNum === index }"
                   v-for="(line, index) in currentLyric.lines"
                   :key="index"
                 >
                   {{ line.txt }}
                 </p>
               </div>
-              <div class="pure-music" v-show="isPureMusic">
+              <div
+                class="pure-music"
+                v-show="isPureMusic"
+              >
                 <p>{{ pureMusicLyric }}</p>
               </div>
             </div>
@@ -64,10 +95,13 @@
         </div>
         <div class="bottom">
           <div class="dot-wrapper">
-            <span class="dot" :class="{ active: currentShow === 'cd' }"></span>
             <span
               class="dot"
-              :class="{ active: currentShow === 'lyric' }"
+              :class="{ 'active': currentShow === 'cd' }"
+            ></span>
+            <span
+              class="dot"
+              :class="{ 'active': currentShow === 'lyric' }"
             ></span>
           </div>
           <div class="progress-wrapper">
@@ -83,21 +117,39 @@
             <span class="time time-r">{{ format(currentSong.duration) }}</span>
           </div>
           <div class="operators">
-            <div class="icon i-left" @click="changeMode">
+            <div
+              class="icon i-left"
+              @click="changeMode"
+            >
               <i :class="iconMode"></i>
             </div>
-            <div class="icon i-left" :class="disableCls">
-              <i @click="prev" class="icon-prev"></i>
+            <div
+              class="icon i-left"
+              :class="disableCls"
+            >
+              <i
+                @click="prev"
+                class="icon-prev"
+              ></i>
             </div>
-            <div class="icon i-center" :class="disableCls">
+            <div
+              class="icon i-center"
+              :class="disableCls"
+            >
               <i
                 class="needsclick"
                 @click="togglePlaying"
                 :class="playIcon"
               ></i>
             </div>
-            <div class="icon i-right" :class="disableCls">
-              <i @click="next" class="icon-next"></i>
+            <div
+              class="icon i-right"
+              :class="disableCls"
+            >
+              <i
+                @click="next"
+                class="icon-next"
+              ></i>
             </div>
             <div class="icon i-right">
               <i
@@ -111,9 +163,16 @@
       </div>
     </transition>
     <transition name="mini">
-      <div class="mini-player" v-show="!fullScreen" @click="open">
+      <div
+        class="mini-player"
+        v-show="!fullScreen"
+        @click="open"
+      >
         <div class="icon">
-          <div class="imgWrapper" ref="miniWrapper">
+          <div
+            class="imgWrapper"
+            ref="miniWrapper"
+          >
             <img
               ref="miniImage"
               :class="cdCls"
@@ -124,11 +183,20 @@
           </div>
         </div>
         <div class="text">
-          <h2 class="name" v-html="currentSong.name"></h2>
-          <p class="desc" v-html="currentSong.singer"></p>
+          <h2
+            class="name"
+            v-html="currentSong.name"
+          ></h2>
+          <p
+            class="desc"
+            v-html="currentSong.singer"
+          ></p>
         </div>
         <div class="control">
-          <progress-circle :radius="radius" :percent="percent">
+          <progress-circle
+            :radius="radius"
+            :percent="percent"
+          >
             <i
               @click.stop="togglePlaying"
               class="icon-mini"
@@ -136,7 +204,10 @@
             ></i>
           </progress-circle>
         </div>
-        <div class="control" @click.stop="showPlaylist">
+        <div
+          class="control"
+          @click.stop="showPlaylist"
+        >
           <i class="icon-playlist"></i>
         </div>
       </div>
@@ -170,7 +241,7 @@ import Playlist from 'components/playlist/playlist'
 const transform = prefixStyle('transform')
 const transitionDuration = prefixStyle('transitionDuration')
 
-const timeExp = /\[(\d{2}):(\d{2}):(\d{2})]/g
+const timeExp = /\[(\d{2}):(\d{2}).(\d{2})\]/g
 
 export default {
   mixins: [playerMixin],
@@ -271,7 +342,7 @@ export default {
         return
       }
       this.setPlayingState(!this.playing)
-      if (this.currentLyric) {
+      if (this.currentLyric && this.canLyricPlay) {
         this.currentLyric.togglePlay()
       }
     },
@@ -538,7 +609,10 @@ export default {
       let image = this.$refs[inner]
       let wTransform = getComputedStyle(imageWrapper)[transform]
       let iTransform = getComputedStyle(image)[transform]
-      imageWrapper.style[transform] = wTransform === 'none' ? iTransform : iTransform.concat(' ', wTransform)
+      imageWrapper.style[transform] =
+        wTransform === 'none'
+          ? iTransform
+          : iTransform.concat(' ', wTransform)
     },
     ...mapMutations({
       setFullScreen: types.SET_FULL_SCREEN
@@ -563,13 +637,18 @@ export default {
         this.currentLineNum = 0
       }
       this.$refs.audio.src = newSong.url
-      this.$refs.audio.play()
+      // this.$refs.audio.play()
+      // this.getLyric()
+      // 异步操作是自己改动，不知道为什么非异步就会播放失败
+      this.$nextTick(() => {
+        this.$refs.audio.play()
+        this.getLyric()
+      })
       // 若歌曲 5s 未播放，则认为超时，修改状态确保可以切换歌曲。
       clearTimeout(this.timer)
       this.timer = setTimeout(() => {
         this.songReady = true
       }, 5000)
-      this.getLyric()
     },
     playing(newPlaying) {
       if (!this.songReady) {
@@ -579,6 +658,7 @@ export default {
       this.$nextTick(() => {
         newPlaying ? audio.play() : audio.pause()
       })
+      // 如果已切换到暂停状态，设置最新歌手头像转动角度
       if (!newPlaying) {
         if (this.fullScreen) {
           this.syncWrapperTransform('imageWrapper', 'image')
@@ -588,6 +668,9 @@ export default {
       }
     },
     fullScreen(newVal) {
+      // fullScreen,当新值为true也就是全屏显示播放器时
+      // 歌词的scroll重新refresh()
+      // 然后把最新的播放时间占比percent传给进度条组件progressBar
       if (newVal) {
         setTimeout(() => {
           this.$refs.lyricList.refresh()

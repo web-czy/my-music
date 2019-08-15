@@ -22,13 +22,12 @@ export const selectPlay = function({ commit, state }, { list, index }) {
     // 如果当前播放模式是随机
     let randomlist = shuffle(list);
     commit(types.SET_PLAYLIST, randomlist);
-    let randomIndex = findIndex(randomlist, list[index]);
-    commit(types.SET_CURRENT_INDEX, randomIndex);
+    index = findIndex(randomlist, list[index]);
   } else {
     // 正常
     commit(types.SET_PLAYLIST, list);
-    commit(types.SET_CURRENT_INDEX, index);
   }
+  commit(types.SET_CURRENT_INDEX, index);
   commit(types.SET_FULL_SCREEN, true);
   commit(types.SET_PLAYING_STATE, true);
 };
