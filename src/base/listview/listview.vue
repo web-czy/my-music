@@ -69,7 +69,7 @@ import Scroll from 'base/scroll/scroll'
 import Loading from 'base/loading/loading'
 import { getData } from 'common/js/dom'
 
-const ITLE_HEIGHT = 30
+const TITLE_HEIGHT = 30
 const ANCHOR_HEIGHT = 18
 
 export default {
@@ -105,7 +105,9 @@ export default {
       if (this.scrollY > 0) {
         return ''
       }
-      return this.data[this.currentIndex] ? this.data[this.currentIndex].title : ''
+      return this.data[this.currentIndex]
+        ? this.data[this.currentIndex].title
+        : ''
     }
   },
   methods: {
@@ -127,7 +129,8 @@ export default {
       // 后边加上或0 |0 就和Math.floor()的效果是一样的,向下取整
       // delta: 偏移的锚点
       // 用当前移动触摸的y轴坐标减去触摸屏幕时手落下的y轴坐标
-      // 比如321(G)-287(E)=34再除以li的高度18  等于1.8888，向下取整为1，所以向下偏移1个下标
+      // 比如321(G)-287(E)=34再除以li的高度18
+      // 等于1.8888，向下取整为1，所以向下偏移1个下标
       let delta = (this.touch.y2 - this.touch.y1) / ANCHOR_HEIGHT | 0
       let anchorIndex = parseInt(this.touch.anchorIndex) + delta
       this._scrollTo(anchorIndex)
@@ -191,7 +194,7 @@ export default {
       this.currentIndex = listHeight.length - 2
     },
     diff(newVal) {
-      let fixedTop = (newVal > 0 && newVal < ITLE_HEIGHT) ? newVal - ITLE_HEIGHT : 0
+      let fixedTop = (newVal > 0 && newVal < TITLE_HEIGHT) ? newVal - TITLE_HEIGHT : 0
       // 如果两个值相同，就没有必要再赋值和执行动画
       // 减少DOM操作
       if (this.fixedTop === fixedTop) {
